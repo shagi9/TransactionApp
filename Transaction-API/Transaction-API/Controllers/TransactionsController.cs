@@ -9,6 +9,9 @@ using Transaction_API.Models;
 
 namespace Transaction_API.Controllers
 {
+    /// <summary>
+    /// Transactions Controlller
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class TransactionsController : ControllerBase
@@ -20,14 +23,21 @@ namespace Transaction_API.Controllers
             _context = context;
         }
 
-        // GET: api/Transactions
+        /// <summary>
+        /// GET: api/Transactions
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
             return await _context.Transactions.ToListAsync();
         }
 
-        // POST: api/Transactions
+        /// <summary>
+        /// POST: api/Transactions
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
@@ -37,7 +47,11 @@ namespace Transaction_API.Controllers
             return CreatedAtAction("GetTransaction", new { id = transaction.Id }, transaction);
         }
 
-        // DELETE: api/Transactions/5
+        /// <summary>
+        /// DELETE: api/Transactions/5
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult<Transaction>> DeleteTransaction(int id)
         {

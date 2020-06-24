@@ -12,15 +12,27 @@ namespace Transaction_API.Models
         [Key]
         public int Id { get; set; }
         
+        /// <summary>
+        /// Status of transaction
+        /// </summary>
         [Column(TypeName = "nvarchar(10)")]
         public string Status { get; set; }
 
+        /// <summary>
+        /// Type of transaction
+        /// </summary>
         [Column(TypeName = "nvarchar(10)")]
         public string Type { get; set; }
 
+        /// <summary>
+        /// Client name of transaction
+        /// </summary>
         [Column(TypeName = "nvarchar(20)")]
         public string ClientName { get; set; }
-        
+
+        /// <summary>
+        /// Amount of money
+        /// </summary>
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
     }
