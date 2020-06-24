@@ -9,8 +9,8 @@ using Transaction_API.Models;
 namespace Transaction_API.Migrations
 {
     [DbContext(typeof(TransactionDbContext))]
-    [Migration("20200623165010_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20200624121620_sdsa")]
+    partial class sdsa
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

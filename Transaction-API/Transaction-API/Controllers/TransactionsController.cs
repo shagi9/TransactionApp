@@ -41,10 +41,46 @@ namespace Transaction_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
+
             _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetTransaction", new { id = transaction.Id }, transaction);
+        }
+
+        /// <summary>
+        /// PUT: api/Transaction/5  
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTransaction(int id, Transaction transaction)
+        {
+            if (id != transaction.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(transaction).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TransactionExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
         /// <summary>
@@ -65,6 +101,11 @@ namespace Transaction_API.Controllers
             await _context.SaveChangesAsync();
 
             return transaction;
+        }
+
+        private bool TransactionExists(int id)
+        {
+            return _context.Transactions.Any(e => e.Id == id);
         }
     }
 }
