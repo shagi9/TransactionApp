@@ -2,7 +2,7 @@
 
 namespace Transaction_API.Migrations
 {
-    public partial class sdsa : Migration
+    public partial class @new : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -10,7 +10,7 @@ namespace Transaction_API.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Status = table.Column<string>(type: "nvarchar(10)", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(10)", nullable: true),

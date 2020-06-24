@@ -9,8 +9,8 @@ using Transaction_API.Models;
 namespace Transaction_API.Migrations
 {
     [DbContext(typeof(TransactionDbContext))]
-    [Migration("20200624121620_sdsa")]
-    partial class sdsa
+    [Migration("20200624180857_new")]
+    partial class @new
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -22,9 +22,9 @@ namespace Transaction_API.Migrations
 
             modelBuilder.Entity("Transaction_API.Models.Transaction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("Amount")

@@ -10,7 +10,7 @@ namespace Transaction_API.Models
     public class Transaction
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
         
         /// <summary>
         /// Status of transaction
