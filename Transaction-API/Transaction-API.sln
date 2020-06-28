@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transaction-API", "Transaction-API\Transaction-API.csproj", "{979B64F0-254C-4756-8B2E-FEFC2FC7DB09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TA.WebUI", "Transaction-API\TA.WebUI.csproj", "{979B64F0-254C-4756-8B2E-FEFC2FC7DB09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TA.Business", "TA.Business\TA.Business.csproj", "{FB5B4507-C091-4DF0-9C57-0444F0F40F54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TA.Data", "TA.Data\TA.Data.csproj", "{BD22FA82-78E7-4BEE-9D8D-36089288375F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{979B64F0-254C-4756-8B2E-FEFC2FC7DB09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{979B64F0-254C-4756-8B2E-FEFC2FC7DB09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{979B64F0-254C-4756-8B2E-FEFC2FC7DB09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB5B4507-C091-4DF0-9C57-0444F0F40F54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB5B4507-C091-4DF0-9C57-0444F0F40F54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB5B4507-C091-4DF0-9C57-0444F0F40F54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB5B4507-C091-4DF0-9C57-0444F0F40F54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD22FA82-78E7-4BEE-9D8D-36089288375F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD22FA82-78E7-4BEE-9D8D-36089288375F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD22FA82-78E7-4BEE-9D8D-36089288375F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD22FA82-78E7-4BEE-9D8D-36089288375F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

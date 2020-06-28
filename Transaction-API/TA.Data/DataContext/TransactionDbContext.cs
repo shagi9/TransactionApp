@@ -1,15 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using TA.Data.Entities;
 
-namespace Transaction_API.Models
+namespace TA.Data.DataContext
 {
     public class TransactionDbContext : DbContext
     {
         public TransactionDbContext(DbContextOptions<TransactionDbContext> options) : base(options) { }
 
         public DbSet<Transaction> Transactions { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(TransactionDbContext).Assembly);
+        }
     }
 }

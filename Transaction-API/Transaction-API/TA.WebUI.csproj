@@ -16,6 +16,11 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TA.Business\TA.Business.csproj" />
+    <ProjectReference Include="..\TA.Data\TA.Data.csproj" />
+  </ItemGroup>
   
   <PropertyGroup>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
