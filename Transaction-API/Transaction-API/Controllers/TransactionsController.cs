@@ -8,6 +8,7 @@ using TA.Data.DataContext;
 using Microsoft.EntityFrameworkCore.Storage;
 using TA.Business.Interfaces;
 using TA.Business.Services;
+using X.PagedList;
 
 namespace Transaction_API.Controllers
 {
@@ -18,9 +19,9 @@ namespace Transaction_API.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase
     {
-        private readonly ITransaction _service;
+        private readonly ITransactionService _service;
 
-        public TransactionsController(ITransaction service)
+        public TransactionsController(ITransactionService service)
         {
             _service = service;
         }
@@ -31,6 +32,21 @@ namespace Transaction_API.Controllers
             var transactions = await _service.GetAllTransactions();
             return transactions;
         }
+
+        [HttpGet("pagination")]
+        public async Task<IPagedList<Transaction>> Pagination(int? page)
+        {
+            var sort = await _service.Pagination(page);
+            return sort;
+        }
+
+        [HttpGet("filtering")]
+        public async Task<ActionResult<List<Transaction>>> Filering(string sortOrder)
+        {
+            var sort = await _service.Filtering(sortOrder);
+            return sort;
+        }
+
 
         [HttpPost("add")]
        public async Task<ActionResult<Transaction>> AddTransaction(string status, string type, string clientName, decimal amount)

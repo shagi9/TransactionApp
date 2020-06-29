@@ -48,7 +48,7 @@ namespace Transaction_API
             options.UseSqlServer(Configuration.GetConnectionString("DevConnection"),
                 x => x.MigrationsAssembly("TA.Data")));
 
-            services.AddTransient<ITransaction, TransactionService>();
+            services.AddTransient<ITransactionService, TransactionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
