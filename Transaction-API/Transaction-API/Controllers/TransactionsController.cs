@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using TA.Business.Interfaces;
 using TA.Business.Services;
 using X.PagedList;
+using System.IO;
+using ClosedXML.Excel;
 
 namespace Transaction_API.Controllers
 {
@@ -20,10 +22,11 @@ namespace Transaction_API.Controllers
     public class TransactionsController : ControllerBase
     {
         private readonly ITransactionService _service;
-
-        public TransactionsController(ITransactionService service)
+        private readonly TransactionDbContext _context;
+        public TransactionsController(ITransactionService service, TransactionDbContext context)
         {
             _service = service;
+            _context = context;
         }
 
         [HttpGet("get all")]
@@ -40,14 +43,20 @@ namespace Transaction_API.Controllers
             return sort;
         }
 
-        [HttpGet("filtering")]
-        public async Task<ActionResult<List<Transaction>>> Filering(string sortOrder)
+        [HttpGet("filtering by type")]
+        public async Task<List<Transaction>> FilteringByType(string sortByType)
         {
-            var sort = await _service.Filtering(sortOrder);
+            var sort = await _service.FilteringByType(sortByType);
             return sort;
         }
 
-
+        [HttpGet("filtering by status")]
+        public async Task<List<Transaction>> FilteringByStatus(string sortByStatus)
+        {
+            var sort = await _service.FilteringByStatus(sortByStatus);
+            return sort;
+        }
+            
         [HttpPost("add")]
        public async Task<ActionResult<Transaction>> AddTransaction(string status, string type, string clientName, decimal amount)
         {
@@ -67,6 +76,39 @@ namespace Transaction_API.Controllers
         {
             var deleteTransaction = await _service.DeleteTransaction(id);
             return deleteTransaction;
+        }
+         
+        [HttpGet("csv")]
+        public IActionResult ExportFile()
+        {
+            var transactions = _context.Transactions.ToList();
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.AddWorksheet("Transactions");
+                var currentRow = 1;
+                worksheet.Cell(currentRow, 1).Value = "Id";
+                worksheet.Cell(currentRow, 2).Value = "Status";
+                worksheet.Cell(currentRow, 3).Value = "Type";
+                worksheet.Cell(currentRow, 4).Value = "ClientName";
+                worksheet.Cell(currentRow, 5).Value = "Amount";
+
+                foreach (var trans in transactions)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = trans.Id;
+                    worksheet.Cell(currentRow, 2).Value = trans.Status;
+                    worksheet.Cell(currentRow, 3).Value = trans.Type;
+                    worksheet.Cell(currentRow, 4).Value = trans.ClientName;
+                    worksheet.Cell(currentRow, 5).Value = trans.Amount;
+                }
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "Transactions.xlsx");
+                }
+            }
         }
     }
 }

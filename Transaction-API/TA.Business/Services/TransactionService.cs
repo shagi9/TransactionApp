@@ -1,16 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Net;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using TA.Business.Interfaces;
 using TA.Data.DataContext;
 using TA.Data.Entities;
-using System.Security.Cryptography.X509Certificates;
 using X.PagedList;
+using System.IO;
+using DocumentFormat.OpenXml.Spreadsheet;
+using ClosedXML.Excel;
+using System;
+using Microsoft.AspNetCore.Mvc;
+using System.Web;
 
 namespace TA.Business.Services
 {
@@ -37,7 +39,7 @@ namespace TA.Business.Services
             return newTransaction;
         }
         
-        //
+        // pagination
         public async Task<IPagedList<Transaction>> Pagination(int? page)
         {
             var pageNumber = page ?? 1;
@@ -46,29 +48,41 @@ namespace TA.Business.Services
             return onepage;
         }
 
-        // Filtering by string
-        public async Task<List<Transaction>> Filtering(string sortOrder)
+        // Filtering by type
+        public async Task<List<Transaction>> FilteringByType(string sortByType)
         {
             var transactions = await _context.Transactions
-            .Where(x => x.Status.Contains(sortOrder)
-                || x.Type.Contains(sortOrder))
+            .Where(x => x.Type.Contains(sortByType))
+            .ToListAsync();
+
+            switch (sortByType)
+            {
+                case "Refill":
+                    transactions = transactions.OrderBy(x => x.Type).ToList();
+                    break;
+                case "Withdrawal":
+                    transactions = transactions.OrderBy(x => x.Type).ToList();
+                    break;
+            }
+            return transactions;
+        }
+
+        // Filtering by status
+        public async Task<List<Transaction>> FilteringByStatus(string sortByStatus)
+        {
+            var transactions = await _context.Transactions
+            .Where(x => x.Status.Contains(sortByStatus))
             .ToListAsync();
             
-            switch (sortOrder)
+            switch (sortByStatus)
             {
+                case "Pending":
+                    transactions = transactions.OrderBy(x => x.Status).ToList();
+                break;
                 case "Cancelled":
                     transactions = transactions.OrderBy(x => x.Status).ToList();
                 break;
                 case "Completed":
-                    transactions = transactions.OrderBy(x => x.Status).ToList();
-                break;
-                case "Refill":
-                    transactions = transactions.OrderBy(x => x.Type).ToList();
-                break;
-                case "Withdrawal":
-                    transactions = transactions.OrderBy(x => x.Type).ToList();
-                break;
-                default:
                     transactions = transactions.OrderBy(x => x.Status).ToList();
                 break;
             }
