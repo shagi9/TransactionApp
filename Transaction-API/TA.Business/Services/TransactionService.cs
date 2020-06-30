@@ -6,13 +6,7 @@ using System.Threading.Tasks;
 using TA.Business.Interfaces;
 using TA.Data.DataContext;
 using TA.Data.Entities;
-using X.PagedList;
-using System.IO;
-using DocumentFormat.OpenXml.Spreadsheet;
-using ClosedXML.Excel;
-using System;
-using Microsoft.AspNetCore.Mvc;
-using System.Web;
+using TA.Business.Helpers;
 
 namespace TA.Business.Services
 {
@@ -39,62 +33,21 @@ namespace TA.Business.Services
             return newTransaction;
         }
         
-        // pagination
-        public async Task<IPagedList<Transaction>> Pagination(int? page)
+        // Get all transactions with pagination and filtering
+        public async Task<PagedList<Transaction>> GetAllTransactions(UserParams userParams)
         {
-            var pageNumber = page ?? 1;
-            int pageSize = 2;
-            var onepage = await _context.Transactions.ToPagedListAsync(pageNumber, pageSize);
-            return onepage;
-        }
+            var transactions = _context.Transactions.AsQueryable();
 
-        // Filtering by type
-        public async Task<List<Transaction>> FilteringByType(string sortByType)
-        {
-            var transactions = await _context.Transactions
-            .Where(x => x.Type.Contains(sortByType))
-            .ToListAsync();
-
-            switch (sortByType)
+            if (!string.IsNullOrEmpty(userParams.OrderByStatus))
             {
-                case "Refill":
-                    transactions = transactions.OrderBy(x => x.Type).ToList();
-                    break;
-                case "Withdrawal":
-                    transactions = transactions.OrderBy(x => x.Type).ToList();
-                    break;
+                transactions = transactions.Where(s => s.Status.Contains(userParams.OrderByStatus));
             }
-            return transactions;
-        }
-
-        // Filtering by status
-        public async Task<List<Transaction>> FilteringByStatus(string sortByStatus)
-        {
-            var transactions = await _context.Transactions
-            .Where(x => x.Status.Contains(sortByStatus))
-            .ToListAsync();
-            
-            switch (sortByStatus)
+            if (!string.IsNullOrEmpty(userParams.OrderByType))
             {
-                case "Pending":
-                    transactions = transactions.OrderBy(x => x.Status).ToList();
-                break;
-                case "Cancelled":
-                    transactions = transactions.OrderBy(x => x.Status).ToList();
-                break;
-                case "Completed":
-                    transactions = transactions.OrderBy(x => x.Status).ToList();
-                break;
+                transactions = transactions.Where(s => s.Type.Contains(userParams.OrderByType));
             }
-            return transactions;
-        }
 
-        // Get all transactions
-        public async Task<List<Transaction>> GetAllTransactions()
-        {
-            List<Transaction> transactions = new List<Transaction>();
-            transactions = await _context.Transactions.ToListAsync();
-            return transactions;
+            return await PagedList<Transaction>.CreateAsync(transactions, userParams.PageNumber, userParams.PageSize);
         }
 
         // Update status of transaction

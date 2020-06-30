@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TA.Data.Entities;
 using TA.Data.DataContext;
-using Microsoft.EntityFrameworkCore.Storage;
 using TA.Business.Interfaces;
-using TA.Business.Services;
-using X.PagedList;
 using System.IO;
 using ClosedXML.Excel;
+using TA.Business.Helpers;
+
 
 namespace Transaction_API.Controllers
 {
@@ -29,32 +26,18 @@ namespace Transaction_API.Controllers
             _context = context;
         }
 
-        [HttpGet("get all")]
-        public async Task<ActionResult<List<Transaction>>> GetAllTransactions()
+        /// <summary>
+        /// returns something
+        /// </summary>
+        /// <param name="userParams"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<Transaction>> GetAllTransactions([FromQuery]UserParams userParams)
         {
-            var transactions = await _service.GetAllTransactions();
-            return transactions;
-        }
 
-        [HttpGet("pagination")]
-        public async Task<IPagedList<Transaction>> Pagination(int? page)
-        {
-            var sort = await _service.Pagination(page);
-            return sort;
-        }
+            var transactions = await _service.GetAllTransactions(userParams);
+            return Ok(transactions);
 
-        [HttpGet("filtering by type")]
-        public async Task<List<Transaction>> FilteringByType(string sortByType)
-        {
-            var sort = await _service.FilteringByType(sortByType);
-            return sort;
-        }
-
-        [HttpGet("filtering by status")]
-        public async Task<List<Transaction>> FilteringByStatus(string sortByStatus)
-        {
-            var sort = await _service.FilteringByStatus(sortByStatus);
-            return sort;
         }
             
         [HttpPost("add")]
@@ -76,39 +59,6 @@ namespace Transaction_API.Controllers
         {
             var deleteTransaction = await _service.DeleteTransaction(id);
             return deleteTransaction;
-        }
-         
-        [HttpGet("csv")]
-        public IActionResult ExportFile()
-        {
-            var transactions = _context.Transactions.ToList();
-            using (var workbook = new XLWorkbook())
-            {
-                var worksheet = workbook.AddWorksheet("Transactions");
-                var currentRow = 1;
-                worksheet.Cell(currentRow, 1).Value = "Id";
-                worksheet.Cell(currentRow, 2).Value = "Status";
-                worksheet.Cell(currentRow, 3).Value = "Type";
-                worksheet.Cell(currentRow, 4).Value = "ClientName";
-                worksheet.Cell(currentRow, 5).Value = "Amount";
-
-                foreach (var trans in transactions)
-                {
-                    currentRow++;
-                    worksheet.Cell(currentRow, 1).Value = trans.Id;
-                    worksheet.Cell(currentRow, 2).Value = trans.Status;
-                    worksheet.Cell(currentRow, 3).Value = trans.Type;
-                    worksheet.Cell(currentRow, 4).Value = trans.ClientName;
-                    worksheet.Cell(currentRow, 5).Value = trans.Amount;
-                }
-                using (var stream = new MemoryStream())
-                {
-                    workbook.SaveAs(stream);
-                    var content = stream.ToArray();
-                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        "Transactions.xlsx");
-                }
-            }
         }
     }
 }
