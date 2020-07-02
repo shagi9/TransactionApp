@@ -7,6 +7,10 @@ using TA.Business.Interfaces;
 using TA.Data.DataContext;
 using TA.Data.Entities;
 using TA.Business.Helpers;
+using Microsoft.AspNetCore.Mvc;
+using ClosedXML.Excel;
+using System.IO;
+using System;
 
 namespace TA.Business.Services
 {
@@ -71,6 +75,32 @@ namespace TA.Business.Services
             _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
             return transaction;
+        }
+        public XLWorkbook getData()
+        {
+            List<Transaction> transactions = _context.Transactions.ToList();
+            var workbook = new XLWorkbook();
+            IXLWorksheet worksheet =
+                    workbook.Worksheets.Add("Transactions");
+            worksheet.Cell(1, 1).Value = "Id";
+            worksheet.Cell(1, 2).Value = "Status";
+            worksheet.Cell(1, 3).Value = "Type";
+            worksheet.Cell(1, 4).Value = "ClientName";
+            worksheet.Cell(1, 5).Value = "Amount";
+            for (int index = 1; index <= transactions.Count; index++)
+            {
+                worksheet.Cell(index + 1, 1).Value =
+                transactions[index - 1].Id;
+                worksheet.Cell(index + 1, 2).Value =
+                transactions[index - 1].Status;
+                worksheet.Cell(index + 1, 3).Value =
+                transactions[index - 1].Type;
+                worksheet.Cell(index + 1, 4).Value =
+                transactions[index - 1].ClientName;
+                worksheet.Cell(index + 1, 5).Value =
+                transactions[index - 1].Amount;
+            }
+            return workbook;
         }
     }
 }

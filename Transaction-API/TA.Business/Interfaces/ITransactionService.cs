@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ClosedXML.Excel;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TA.Business.Helpers;
 using TA.Data.Entities;
@@ -11,5 +12,6 @@ namespace TA.Business.Interfaces
         Task<PagedList<Transaction>> GetAllTransactions(UserParams userParams);
         Task<Transaction> UpdateTransaction(int id, string status);
         Task<Transaction> DeleteTransaction(int id);
+        public XLWorkbook getData();
     }
 }
