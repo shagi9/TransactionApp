@@ -18,6 +18,7 @@ using System.Text;
 using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using ClosedXML.Excel;
 using System.Net.Http;
+using TA.Business.Models;
 
 namespace Transaction_API.Controllers
 {
@@ -59,10 +60,14 @@ namespace Transaction_API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<Transaction> PutTransaction(int id, string status)
+        public async Task<ActionResult<Transaction>> PutTransaction(int id, UpdateTransactionVm updateTransactionVm)
         {
-            var trans = await _service.UpdateTransaction(id, status);
-            return trans;
+            var updatingTransaction = await _service.UpdateTransaction(updateTransactionVm);
+            if (id != updateTransactionVm.Id)
+            {
+                return BadRequest();
+            }
+            return updatingTransaction;
         }
 
         [HttpDelete("{id}")]
@@ -72,7 +77,7 @@ namespace Transaction_API.Controllers
             return deleteTransaction;
         }
 
-        [HttpPost("export in excel")]
+        [HttpPost("export to excel")]
         public IActionResult DownloadExcelDocument()
         {
             var data = _service.getData();

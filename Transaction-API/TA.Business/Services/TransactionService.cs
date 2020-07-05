@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using ClosedXML.Excel;
 using System.IO;
 using System;
+using TA.Business.Models;
 
 namespace TA.Business.Services
 {
@@ -50,22 +51,26 @@ namespace TA.Business.Services
             {
                 transactions = transactions.Where(s => s.Type.Contains(userParams.OrderByType));
             }
-
             return await PagedList<Transaction>.CreateAsync(transactions, userParams.PageNumber, userParams.PageSize);
         }
 
         // Update status of transaction
-        public async Task<Transaction> UpdateTransaction(int id, string status)
+        public async Task<Transaction> UpdateTransaction(UpdateTransactionVm updateTransactionVm)
         {
-            var transaction = await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id);
-            var newTransaction = new Transaction
+            var transaction = await _context.Transactions.Where(t => t.Id == updateTransactionVm.Id).FirstOrDefaultAsync();
+            
+            if (transaction == null)
             {
-                Id = id,
-                Status = status
-            };
-            _context.Transactions.Attach(newTransaction).Property(s => s.Status).IsModified = true;
-            await _context.SaveChangesAsync();
-            return newTransaction;
+                return default;
+            }
+            else
+            {
+                transaction.Id = updateTransactionVm.Id;
+                transaction.Status = updateTransactionVm.Status;
+                await _context.SaveChangesAsync();
+                return transaction;
+            }
+           
         }
 
         // Delete transaction
@@ -76,9 +81,11 @@ namespace TA.Business.Services
             await _context.SaveChangesAsync();
             return transaction;
         }
+
+        // export to excel
         public XLWorkbook getData()
         {
-            List<Transaction> transactions = _context.Transactions.ToList();
+            var transactions = _context.Transactions.ToList();
             var workbook = new XLWorkbook();
             IXLWorksheet worksheet =
                     workbook.Worksheets.Add("Transactions");
