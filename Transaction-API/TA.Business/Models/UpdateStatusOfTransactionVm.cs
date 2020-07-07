@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TA.Business.Models
 {
-    public class UpdateTransactionVm
+    public class UpdateStatusOfTransactionVm
     {
         public int Id { get; set; }
         public string Status { get; set; }

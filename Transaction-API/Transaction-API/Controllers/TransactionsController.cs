@@ -19,6 +19,7 @@ using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using ClosedXML.Excel;
 using System.Net.Http;
 using TA.Business.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Transaction_API.Controllers
 {
@@ -49,20 +50,19 @@ namespace Transaction_API.Controllers
         {
             var transactions = await _service.GetAllTransactions(userParams);
             return Ok(transactions);
-
         }
 
-        [HttpPost("add")]
-        public async Task<ActionResult<Transaction>> AddTransaction(string status, string type, string clientName, decimal amount)
+        [HttpPost]
+        public async Task<Transaction> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction)
         {
-            var newTransaction = await _service.AddTransaction(status, type, clientName, amount);
-            return newTransaction;
+            var trans = await _service.AddOrUpdateTransaction(addOrUpdateTransaction);
+            return trans;
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Transaction>> PutTransaction(int id, UpdateTransactionVm updateTransactionVm)
+        public async Task<ActionResult<Transaction>> UpdateStatusOfTransaction(int id, UpdateStatusOfTransactionVm updateTransactionVm)
         {
-            var updatingTransaction = await _service.UpdateTransaction(updateTransactionVm);
+            var updatingTransaction = await _service.UpdateStatusOfTransaction(updateTransactionVm);
             if (id != updateTransactionVm.Id)
             {
                 return BadRequest();
@@ -96,6 +96,6 @@ namespace Transaction_API.Controllers
             {
                 throw new NotImplementedException();
             }
-        }
+        }   
     }
 }

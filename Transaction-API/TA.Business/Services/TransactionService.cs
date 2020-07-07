@@ -12,6 +12,7 @@ using ClosedXML.Excel;
 using System.IO;
 using System;
 using TA.Business.Models;
+using DocumentFormat.OpenXml.Office2010.PowerPoint;
 
 namespace TA.Business.Services
 {
@@ -23,21 +24,36 @@ namespace TA.Business.Services
             _context = context;
         }
 
-        // Add new transaction
-        public async Task<Transaction> AddTransaction(string status, string type, string clientName, decimal amount)
+        // add or update transaction
+        public async Task<Transaction> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction)
         {
-            Transaction newTransaction = new Transaction
+            var transaction = await _context.Transactions.Where(t => t.Id == addOrUpdateTransaction.Id).FirstOrDefaultAsync();
+            
+            if (transaction == null)
             {
-                Status = status,
-                Type = type,
-                ClientName = clientName,
-                Amount = amount
-            };
-            await _context.Transactions.AddAsync(newTransaction);
-            await _context.SaveChangesAsync();
-            return newTransaction;
+                Transaction newTransaction = new Transaction
+                {
+                    Status = addOrUpdateTransaction.Status,
+                    Type = addOrUpdateTransaction.Type,
+                    ClientName = addOrUpdateTransaction.ClientName,
+                    Amount = addOrUpdateTransaction.Amount
+                };
+                await _context.Transactions.AddAsync(newTransaction);
+                await _context.SaveChangesAsync();
+                return newTransaction;
+            }
+            else
+            {
+                transaction.Id = addOrUpdateTransaction.Id;
+                transaction.Status = addOrUpdateTransaction.Status;
+                transaction.Type = addOrUpdateTransaction.Type;
+                transaction.ClientName = addOrUpdateTransaction.ClientName;
+                transaction.Amount = addOrUpdateTransaction.Amount;
+                await _context.SaveChangesAsync();
+                return transaction;
+            }
         }
-        
+
         // Get all transactions with pagination and filtering
         public async Task<PagedList<Transaction>> GetAllTransactions(UserParams userParams)
         {
@@ -55,7 +71,7 @@ namespace TA.Business.Services
         }
 
         // Update status of transaction
-        public async Task<Transaction> UpdateTransaction(UpdateTransactionVm updateTransactionVm)
+        public async Task<Transaction> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm)
         {
             var transaction = await _context.Transactions.Where(t => t.Id == updateTransactionVm.Id).FirstOrDefaultAsync();
             
@@ -70,7 +86,6 @@ namespace TA.Business.Services
                 await _context.SaveChangesAsync();
                 return transaction;
             }
-           
         }
 
         // Delete transaction
