@@ -59,14 +59,10 @@ namespace Transaction_API.Controllers
             return trans;
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<Transaction>> UpdateStatusOfTransaction(int id, UpdateStatusOfTransactionVm updateTransactionVm)
+        [HttpPut]
+        public async Task<ActionResult<Transaction>> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm)
         {
             var updatingTransaction = await _service.UpdateStatusOfTransaction(updateTransactionVm);
-            if (id != updateTransactionVm.Id)
-            {
-                return BadRequest();
-            }
             return updatingTransaction;
         }
 

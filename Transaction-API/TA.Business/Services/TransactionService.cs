@@ -27,7 +27,7 @@ namespace TA.Business.Services
         // add or update transaction
         public async Task<Transaction> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction)
         {
-            var transaction = await _context.Transactions.Where(t => t.Id == addOrUpdateTransaction.Id).FirstOrDefaultAsync();
+            var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == addOrUpdateTransaction.Id);
             
             if (transaction == null)
             {
@@ -44,11 +44,11 @@ namespace TA.Business.Services
             }
             else
             {
-                transaction.Id = addOrUpdateTransaction.Id;
                 transaction.Status = addOrUpdateTransaction.Status;
                 transaction.Type = addOrUpdateTransaction.Type;
                 transaction.ClientName = addOrUpdateTransaction.ClientName;
                 transaction.Amount = addOrUpdateTransaction.Amount;
+                _context.Transactions.Update(transaction);
                 await _context.SaveChangesAsync();
                 return transaction;
             }
@@ -73,16 +73,16 @@ namespace TA.Business.Services
         // Update status of transaction
         public async Task<Transaction> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm)
         {
-            var transaction = await _context.Transactions.Where(t => t.Id == updateTransactionVm.Id).FirstOrDefaultAsync();
-            
+            var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == updateTransactionVm.Id);
+
             if (transaction == null)
             {
                 return default;
             }
             else
             {
-                transaction.Id = updateTransactionVm.Id;
                 transaction.Status = updateTransactionVm.Status;
+                _context.Transactions.Update(transaction);
                 await _context.SaveChangesAsync();
                 return transaction;
             }
