@@ -1,18 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using TA.Business.Interfaces;
 using TA.Data.DataContext;
 using TA.Data.Entities;
 using TA.Business.Helpers;
-using Microsoft.AspNetCore.Mvc;
 using ClosedXML.Excel;
-using System.IO;
-using System;
 using TA.Business.Models;
-using DocumentFormat.OpenXml.Office2010.PowerPoint;
+using System;
 
 namespace TA.Business.Services
 {
@@ -25,33 +20,44 @@ namespace TA.Business.Services
         }
 
         // add or update transaction
-        public async Task<Transaction> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction)
+        public async Task<ServiceResponse<Transaction>> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction)
         {
+            ServiceResponse<Transaction> serviceResponse = new ServiceResponse<Transaction>();
             var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == addOrUpdateTransaction.Id);
-            
-            if (transaction == null)
+            try
             {
-                Transaction newTransaction = new Transaction
+                if (transaction == null)
                 {
-                    Status = addOrUpdateTransaction.Status,
-                    Type = addOrUpdateTransaction.Type,
-                    ClientName = addOrUpdateTransaction.ClientName,
-                    Amount = addOrUpdateTransaction.Amount
-                };
-                await _context.Transactions.AddAsync(newTransaction);
-                await _context.SaveChangesAsync();
-                return newTransaction;
+                    Transaction newTransaction = new Transaction
+                    {
+                        Status = addOrUpdateTransaction.Status,
+                        Type = addOrUpdateTransaction.Type,
+                        ClientName = addOrUpdateTransaction.ClientName,
+                        Amount = addOrUpdateTransaction.Amount
+                    };
+                    await _context.Transactions.AddAsync(newTransaction);
+                    await _context.SaveChangesAsync();
+                    serviceResponse.Data = newTransaction;
+                    serviceResponse.Message = "You're transactions has been added";
+                }
+                else
+                {
+                    transaction.Status = addOrUpdateTransaction.Status;
+                    transaction.Type = addOrUpdateTransaction.Type;
+                    transaction.ClientName = addOrUpdateTransaction.ClientName;
+                    transaction.Amount = addOrUpdateTransaction.Amount;
+                    _context.Transactions.Update(transaction);
+                    await _context.SaveChangesAsync();
+                    serviceResponse.Data = transaction;
+                    serviceResponse.Message = "You're transaction has been updated";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                transaction.Status = addOrUpdateTransaction.Status;
-                transaction.Type = addOrUpdateTransaction.Type;
-                transaction.ClientName = addOrUpdateTransaction.ClientName;
-                transaction.Amount = addOrUpdateTransaction.Amount;
-                _context.Transactions.Update(transaction);
-                await _context.SaveChangesAsync();
-                return transaction;
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
             }
+            return serviceResponse;
         }
 
         // Get all transactions with pagination and filtering
@@ -71,30 +77,45 @@ namespace TA.Business.Services
         }
 
         // Update status of transaction
-        public async Task<Transaction> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm)
+        public async Task<ServiceResponse<Transaction>> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm)
         {
-            var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == updateTransactionVm.Id);
-
-            if (transaction == null)
+            ServiceResponse<Transaction> serviceResponse = new ServiceResponse<Transaction>();
+            try
             {
-                return default;
-            }
-            else
-            {
+                var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == updateTransactionVm.Id);
                 transaction.Status = updateTransactionVm.Status;
+                serviceResponse.Data = transaction;
+                serviceResponse.Message = "Status of you're transaction has been updated";
                 _context.Transactions.Update(transaction);
                 await _context.SaveChangesAsync();
-                return transaction;
             }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
         }
 
         // Delete transaction
-        public async Task<Transaction> DeleteTransaction(int id)
+        public async Task<ServiceResponse<Transaction>> DeleteTransaction(int id)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
-            _context.Transactions.Remove(transaction);
-            await _context.SaveChangesAsync();
-            return transaction;
+            ServiceResponse<Transaction> serviceResponse = new ServiceResponse<Transaction>();
+            try
+            {
+                var transaction = await _context.Transactions.FindAsync(id);
+                _context.Transactions.Remove(transaction);
+                await _context.SaveChangesAsync();
+                serviceResponse.Data = transaction;
+                serviceResponse.Message = "You're transaction has been deleted";
+                
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
         }
 
         // export to excel

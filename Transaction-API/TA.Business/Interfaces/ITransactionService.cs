@@ -11,9 +11,9 @@ namespace TA.Business.Interfaces
     public interface ITransactionService
     {
         Task<PagedList<Transaction>> GetAllTransactions(UserParams userParams);
-        Task<Transaction> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction);
-        Task<Transaction> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm);
-        Task<Transaction> DeleteTransaction(int id);
+        Task<ServiceResponse<Transaction>> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction);
+        Task<ServiceResponse<Transaction>> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm);
+        Task<ServiceResponse<Transaction>> DeleteTransaction(int id);
         public XLWorkbook getData();
     }
 }

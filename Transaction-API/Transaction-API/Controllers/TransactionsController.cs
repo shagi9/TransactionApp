@@ -1,25 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TA.Data.Entities;
-using TA.Data.DataContext;
 using TA.Business.Interfaces;
 using System.IO;
 using TA.Business.Helpers;
-using System.Collections.Generic;
-using EFCore.BulkExtensions;
 using System;
-using System.Diagnostics;
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
-using OfficeOpenXml;
-using Microsoft.AspNetCore.Hosting;
-using System.Text;
-using DocumentFormat.OpenXml.Office2010.PowerPoint;
-using ClosedXML.Excel;
-using System.Net.Http;
 using TA.Business.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Transaction_API.Controllers
 {
@@ -31,17 +17,14 @@ namespace Transaction_API.Controllers
     public class TransactionsController : ControllerBase
     {
         private readonly ITransactionService _service;
-        private readonly TransactionDbContext _context;
 
-        public TransactionsController(ITransactionService service, 
-            TransactionDbContext context)
+        public TransactionsController(ITransactionService service)
         {
             _service = service;
-            _context = context;
         }
 
         /// <summary>
-        /// returns something
+        /// returns all transactions
         /// </summary>
         /// <param name="userParams"></param>
         /// <returns></returns>
@@ -52,27 +35,58 @@ namespace Transaction_API.Controllers
             return Ok(transactions);
         }
 
+        /// <summary>
+        /// Add transaction or update existing transaction
+        /// </summary>
+        /// <param name="addOrUpdateTransaction"></param>
+        /// <returns>sadsa</returns>
         [HttpPost]
-        public async Task<Transaction> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction)
+        public async Task<IActionResult> AddOrUpdateTransaction(AddOrUpdateTransactionVm addOrUpdateTransaction)
         {
-            var trans = await _service.AddOrUpdateTransaction(addOrUpdateTransaction);
-            return trans;
+            ServiceResponse<Transaction> response = await _service.AddOrUpdateTransaction(addOrUpdateTransaction);
+            if (response.Data == null)
+            {
+                return NotFound();
+            }
+            return Ok(response);
         }
 
+        /// <summary>
+        /// update status of transaction
+        /// </summary>
+        /// <param name="updateTransactionVm"></param>
+        /// <returns></returns>
         [HttpPut]
-        public async Task<ActionResult<Transaction>> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm)
+        public async Task<IActionResult> UpdateStatusOfTransaction(UpdateStatusOfTransactionVm updateTransactionVm)
         {
-            var updatingTransaction = await _service.UpdateStatusOfTransaction(updateTransactionVm);
-            return updatingTransaction;
+            ServiceResponse<Transaction> response = await _service.UpdateStatusOfTransaction(updateTransactionVm);
+            if (response.Data == null)
+            {
+                return NotFound();
+            }
+            return Ok(response);
         }
 
+        /// <summary>
+        /// delete transaction
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Transaction>> DeleteTransaction(int id)
+        public async Task<IActionResult> DeleteTransaction(int id)
         {
-            var deleteTransaction = await _service.DeleteTransaction(id);
-            return deleteTransaction;
+            ServiceResponse<Transaction> response = await _service.DeleteTransaction(id);
+            if (response.Data == null)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
+        /// <summary>
+        /// for now export to excel all datas
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("export to excel")]
         public IActionResult DownloadExcelDocument()
         {
@@ -92,6 +106,6 @@ namespace Transaction_API.Controllers
             {
                 throw new NotImplementedException();
             }
-        }   
+        }
     }
 }
